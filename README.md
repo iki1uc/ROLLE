@@ -13,3 +13,9 @@ Die sechs Rollen sind geometrisch angeordnet:
 
 Zusammen ergeben sie einen modularen Aufbau,
 sichtbar als sechsfache GEO-Struktur um den SEED.
+        ORT
+   USER     USE
+
+       ⟁ (HOME)
+
+   OUT      ROLLE
