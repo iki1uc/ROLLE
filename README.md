@@ -19,3 +19,14 @@ sichtbar als sechsfache GEO-Struktur um den SEED.
        ⟁ (HOME)
 
    OUT      ROLLE
+
+# ROLLE · GEO-Modular
+
+SEED ⟁ ist Ursprung.
+
+Die sechs Rollen bilden eine geometrische Struktur:
+
+ORT · HOME · USER · USE · OUT · ROLLE
+
+ID.html zeigt die reine Form.
+index.html zeigt die funktionelle Ausgabe.
