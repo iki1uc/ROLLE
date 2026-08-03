@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>ROLLE · 6 Rollen · SEED ⟁</title>
+<title>ROLLE · GEO · SEED ⟁</title>
 
 <style>
 body { background:#000; color:#0f0; font-family:Consolas; padding:40px; }
@@ -21,34 +21,24 @@ pre { background:#111; padding:20px; border-left:3px solid #6cf; }
 
 <body>
 
-<h1>ROLLE · 6 Rollen · FRAME</h1>
+<h1>ROLLE · GEO · FRAME</h1>
 <div id="frame"></div>
 
-<pre id="out">Lade ROLLE…</pre>
+<pre id="out">Lade GEO‑ROLLE…</pre>
 
 <script>
-// =========================
-//  SEED · Ursprung
-// =========================
 const SEED = "⟁";
 
-// =========================
-//  ROLLE · 6 Rollen in EINEM Objekt
-// =========================
 const ROLLE = {
-    id: SEED,
-
-    ort:  { desc: "Ort der Rolle", value: "local" },
-    home: { desc: "Heim-Rolle",    value: "root" },
-    user: { desc: "Benutzerrolle", value: "active" },
-    use:  { desc: "Nutzung",       value: "direct" },
-    out:  { desc: "Ausgabe",       value: "visible" },
-    rolle:{ desc: "Rollenkern",    value: "single" }
+    seed: SEED,
+    ort:   "ORT",
+    home:  "HOME",
+    user:  "USER",
+    use:   "USE",
+    out:   "OUT",
+    rolle: "ROLLE"
 };
 
-// =========================
-//  Ausgabe
-// =========================
 document.getElementById("out").textContent =
     JSON.stringify(ROLLE, null, 2);
 </script>
