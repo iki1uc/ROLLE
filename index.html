@@ -1,53 +1,491 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>ROLLE · GEO · SEED ⟁</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROLLE · UNIVERSAL · SEED ⟁ · Alles rein, alles raus</title>
 
-<style>
-body {
-    background:#000;
-    color:#0f0;
-    font-family:Consolas;
-    padding:40px;
-    text-align:center;
-}
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a12;
+            color: #e6f6ff;
+            font-family: 'Consolas', monospace;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: radial-gradient(ellipse at 30% 40%, #0a0a20 0%, #000 100%);
+        }
 
-h1 { color:#6cf; }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-.geo {
-    position:relative;
-    width:360px;
-    height:360px;
-    margin:40px auto;
-    border:3px solid #6cf;
-    border-radius:12px;
-}
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #ffd700;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+        .header h1 {
+            font-size: 28px;
+            color: #ffd700;
+            letter-spacing: 6px;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+        }
+        .header .sub {
+            color: #445555;
+            font-size: 11px;
+            letter-spacing: 3px;
+        }
+        .header .sub span { color: #88ddbb; }
+        .header .sub .seed { color: #ffd700; }
 
-.item {
-    position:absolute;
-    padding:6px 12px;
-    background:#111;
-    border:1px solid #6cf;
-    border-radius:6px;
-}
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 
-/* GEO-Positionen */
-#ort   { top:10px; left:50%; transform:translateX(-50%); }
-#user  { top:110px; left:40px; }
-#use   { top:110px; right:40px; }
-#seed  { top:150px; left:50%; transform:translateX(-50%); }
-#out   { bottom:110px; left:40px; }
-#rolle { bottom:110px; right:40px; }
-</style>
+        .panel {
+            background: rgba(10,10,20,0.4);
+            border: 1px solid rgba(255,255,255,0.02);
+            border-radius: 16px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+        }
+        .panel h2 {
+            color: #ffd700;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        /* ===== GEO-LAYOUT ===== */
+        .geo-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1/1;
+            margin: 0 auto;
+            border: 2px solid rgba(255,215,0,0.05);
+            border-radius: 16px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .geo-item {
+            position: absolute;
+            padding: 10px 16px;
+            background: rgba(10,10,20,0.6);
+            border: 1px solid rgba(255,215,0,0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            min-width: 60px;
+            font-size: 11px;
+            color: #88ddbb;
+        }
+        .geo-item:hover {
+            border-color: #ffd700;
+            background: rgba(255,215,0,0.05);
+            transform: scale(1.05);
+        }
+        .geo-item .label { color: #666; font-size: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .geo-item .value { color: #ffd700; font-size: 12px; font-weight: bold; margin-top: 2px; }
+        .geo-item .content { color: #88ddbb; font-size: 9px; margin-top: 2px; max-width: 80px; word-wrap: break-word; }
+
+        .geo-item.seed {
+            border-color: #ffd700;
+            background: rgba(255,215,0,0.05);
+            box-shadow: 0 0 30px rgba(255,215,0,0.05);
+            font-size: 18px;
+            color: #ffd700;
+        }
+        .geo-item.seed .label { color: #ffd700; }
+
+        /* Positionen */
+        #geo-ort    { top: 5%; left: 50%; transform: translateX(-50%); }
+        #geo-user   { top: 30%; left: 5%; }
+        #geo-use    { top: 30%; right: 5%; }
+        #geo-seed   { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        #geo-out    { bottom: 30%; left: 5%; }
+        #geo-rolle  { bottom: 30%; right: 5%; }
+
+        /* ===== EDITOR ===== */
+        .editor-row {
+            display: flex;
+            gap: 6px;
+            margin: 6px 0;
+            flex-wrap: wrap;
+        }
+        .editor-row input, .editor-row select {
+            background: #111;
+            color: #9cf;
+            border: 1px solid #333;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 9px;
+            flex: 1;
+            min-width: 80px;
+        }
+        .editor-row input:focus, .editor-row select:focus {
+            border-color: #ffd700;
+            outline: none;
+        }
+
+        button {
+            background: #111;
+            color: #9cf;
+            border: 1px solid #333;
+            padding: 5px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 9px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: #1a1a2a;
+            border-color: #ffd700;
+        }
+        button.primary {
+            border-color: #ffd700;
+            color: #ffd700;
+        }
+        button.primary:hover {
+            background: #ffd700;
+            color: #000;
+        }
+        button.seed {
+            border-color: #ffd700;
+            color: #ffd700;
+            background: rgba(255,215,0,0.05);
+        }
+        button.seed:hover {
+            background: #ffd700;
+            color: #000;
+        }
+
+        .log {
+            background: rgba(0,0,0,0.3);
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 8px;
+            color: #88ddbb;
+            max-height: 80px;
+            overflow-y: auto;
+            font-family: monospace;
+            line-height: 1.4;
+            border: 1px solid rgba(255,255,255,0.02);
+            margin-top: 6px;
+        }
+        .log .entry { padding: 1px 0; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .log .time { color: #445555; }
+        .log .ok { color: #4f4; }
+        .log .warn { color: #ffaa00; }
+        .log .seed { color: #ffd700; }
+        .log .interpret { color: #4fc3f7; }
+
+        .footer {
+            text-align: center;
+            margin-top: 16px;
+            padding: 8px;
+            color: #222;
+            font-size: 8px;
+            letter-spacing: 2px;
+            border-top: 1px solid rgba(255,255,255,0.01);
+        }
+        .footer span { color: #ffd700; }
+
+        .interpret-output {
+            background: rgba(0,0,0,0.3);
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 9px;
+            color: #88ddbb;
+            min-height: 40px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            border: 1px solid rgba(255,255,255,0.02);
+            margin-top: 6px;
+        }
+    </style>
 </head>
-
 <body>
 
-<h1>GEO · ORT · ROLLE · SEED ⟁</h1>
+<div class="container">
 
-<div class="geo">
-    <div id="ort"   class="item">ORT</div>
-    <div id="user"  class="item">USER</div>
-    <div id="use"   class="item">USE</div>
-    <div id="seed"  class="item">
+    <!-- HEADER -->
+    <div class="header">
+        <h1>⟁ ROLLE · UNIVERSAL · SEED</h1>
+        <div class="sub">
+            <span class="seed">SEED</span> ·
+            <span>Alles rein · Alles raus</span> ·
+            <span>Interpretiere · Fülle · Erschaffe</span>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <!-- ===== GEO-LAYOUT ===== -->
+        <div class="panel">
+            <h2>🌀 GEO · SEED ⟁ · 6 ROLLEN</h2>
+            <div class="geo-container" id="geoContainer">
+                <div class="geo-item" id="geo-ort">
+                    <div class="label">ORT</div>
+                    <div class="value" id="val-ort">Position</div>
+                    <div class="content" id="con-ort">—</div>
+                </div>
+                <div class="geo-item" id="geo-user">
+                    <div class="label">USER</div>
+                    <div class="value" id="val-user">Zugriff</div>
+                    <div class="content" id="con-user">—</div>
+                </div>
+                <div class="geo-item" id="geo-use">
+                    <div class="label">USE</div>
+                    <div class="value" id="val-use">Funktion</div>
+                    <div class="content" id="con-use">—</div>
+                </div>
+                <div class="geo-item seed" id="geo-seed">
+                    <div class="label">SEED ⟁</div>
+                    <div class="value" id="val-seed">Ursprung</div>
+                    <div class="content" id="con-seed">—</div>
+                </div>
+                <div class="geo-item" id="geo-out">
+                    <div class="label">OUT</div>
+                    <div class="value" id="val-out">Ausgabe</div>
+                    <div class="content" id="con-out">—</div>
+                </div>
+                <div class="geo-item" id="geo-rolle">
+                    <div class="label">ROLLE</div>
+                    <div class="value" id="val-rolle">Gesamtform</div>
+                    <div class="content" id="con-rolle">—</div>
+                </div>
+            </div>
+
+            <!-- Interpretations-Ausgabe -->
+            <div class="interpret-output" id="interpret-output">⏳ Warte auf Interpretation…</div>
+        </div>
+
+        <!-- ===== EDITOR + INTERPRETATION ===== -->
+        <div class="panel">
+            <h2>✏️ EDITOR · ALLES REIN · ALLES RAUS</h2>
+
+            <!-- Rolle auswählen -->
+            <div class="editor-row">
+                <select id="select-role">
+                    <option value="ORT">ORT</option>
+                    <option value="USER">USER</option>
+                    <option value="USE">USE</option>
+                    <option value="SEED">SEED ⟁</option>
+                    <option value="OUT">OUT</option>
+                    <option value="ROLLE">ROLLE</option>
+                </select>
+                <input type="text" id="input-value" placeholder="Wert (z.B. Zentrum, Zugang, ...)" value="Neue Bedeutung">
+                <input type="text" id="input-content" placeholder="Inhalt (z.B. 3x3, Matrix, Flow, ...)" value="—">
+            </div>
+
+            <!-- Buttons -->
+            <div class="editor-row">
+                <button class="primary" id="btn-set">📝 SETZEN</button>
+                <button class="seed" id="btn-interpret">🌀 INTERPRETIEREN</button>
+                <button id="btn-reset">⟲ RESET</button>
+                <button id="btn-export">📤 EXPORT</button>
+                <button id="btn-import">📥 IMPORT</button>
+                <input type="file" id="fileInput" accept=".json" style="display:none;">
+            </div>
+
+            <!-- Info -->
+            <div style="font-size:8px;color:#445555;margin:4px 0;">
+                <span>🧩 Jede Rolle kann beliebigen Wert & Inhalt tragen</span>
+            </div>
+
+            <!-- Log -->
+            <div class="log" id="log">
+                <div class="entry"><span class="time">[INIT]</span> <span class="seed">⟁ ROLLE · UNIVERSAL · SEED</span></div>
+                <div class="entry"><span class="time">[INIT]</span> <span class="interpret">🌀 Alles rein · Alles raus · Interpretiere frei</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <span>⟁</span> ROLLE · UNIVERSAL · SEED · Alles rein · Alles raus · <span>wieimmer4u</span>
+    </div>
+
+</div>
+
+<script>
+// ============================================================
+// ROLLE · UNIVERSAL · SEED ⟁
+// ============================================================
+
+// ─── STATE ──────────────────────────────────────────────────
+const ROLLE = {
+    ORT:   { value: 'Position', content: '—' },
+    USER:  { value: 'Zugriff', content: '—' },
+    USE:   { value: 'Funktion', content: '—' },
+    SEED:  { value: 'Ursprung', content: '—' },
+    OUT:   { value: 'Ausgabe', content: '—' },
+    ROLLE: { value: 'Gesamtform', content: '—' }
+};
+
+// ─── DOM ────────────────────────────────────────────────────
+const logDiv = document.getElementById('log');
+const interpretOut = document.getElementById('interpret-output');
+
+function log(msg, type = 'ok') {
+    const entry = document.createElement('div');
+    entry.className = 'entry';
+    const time = new Date().toLocaleTimeString();
+    const cls = type === 'ok' ? 'ok' : type === 'warn' ? 'warn' : type === 'seed' ? 'seed' : type === 'interpret' ? 'interpret' : '';
+    entry.innerHTML = `<span class="time">[${time}]</span> <span class="${cls}">${msg}</span>`;
+    logDiv.appendChild(entry);
+    logDiv.scrollTop = logDiv.scrollHeight;
+    while (logDiv.children.length > 30) logDiv.removeChild(logDiv.firstChild);
+}
+
+// ─── UPDATE UI ─────────────────────────────────────────────
+function updateUI() {
+    document.getElementById('val-ort').textContent = ROLLE.ORT.value;
+    document.getElementById('con-ort').textContent = ROLLE.ORT.content;
+    document.getElementById('val-user').textContent = ROLLE.USER.value;
+    document.getElementById('con-user').textContent = ROLLE.USER.content;
+    document.getElementById('val-use').textContent = ROLLE.USE.value;
+    document.getElementById('con-use').textContent = ROLLE.USE.content;
+    document.getElementById('val-seed').textContent = ROLLE.SEED.value;
+    document.getElementById('con-seed').textContent = ROLLE.SEED.content;
+    document.getElementById('val-out').textContent = ROLLE.OUT.value;
+    document.getElementById('con-out').textContent = ROLLE.OUT.content;
+    document.getElementById('val-rolle').textContent = ROLLE.ROLLE.value;
+    document.getElementById('con-rolle').textContent = ROLLE.ROLLE.content;
+}
+
+// ─── SETZEN ─────────────────────────────────────────────────
+function setRole() {
+    const role = document.getElementById('select-role').value;
+    const value = document.getElementById('input-value').value.trim() || '—';
+    const content = document.getElementById('input-content').value.trim() || '—';
+
+    if (ROLLE[role]) {
+        ROLLE[role].value = value;
+        ROLLE[role].content = content;
+        updateUI();
+        log(`📝 ${role} gesetzt: ${value} → ${content}`, 'ok');
+        interpret();
+    }
+}
+
+// ─── INTERPRETIEREN ────────────────────────────────────────
+function interpret() {
+    const seed = ROLLE.SEED;
+    const ort = ROLLE.ORT;
+    const user = ROLLE.USER;
+    const use = ROLLE.USE;
+    const out = ROLLE.OUT;
+    const rolle = ROLLE.ROLLE;
+
+    const text = `⟁ INTERPRETATION · SEED ⟁\n` +
+        `───────────────────────────────\n` +
+        `SEED  (Zentrum): ${seed.value} → ${seed.content}\n` +
+        `ORT   (Position): ${ort.value} → ${ort.content}\n` +
+        `USER  (Zugriff): ${user.value} → ${user.content}\n` +
+        `USE   (Funktion): ${use.value} → ${use.content}\n` +
+        `OUT   (Ausgabe): ${out.value} → ${out.content}\n` +
+        `ROLLE (Gesamt): ${rolle.value} → ${rolle.content}\n` +
+        `───────────────────────────────\n` +
+        `🌀 Alles ist interpretierbar. Alles ist möglich.`;
+
+    interpretOut.textContent = text;
+    log(`🌀 INTERPRETATION · SEED ⟁`, 'interpret');
+}
+
+// ─── RESET ──────────────────────────────────────────────────
+function resetAll() {
+    ROLLE.ORT   = { value: 'Position', content: '—' };
+    ROLLE.USER  = { value: 'Zugriff', content: '—' };
+    ROLLE.USE   = { value: 'Funktion', content: '—' };
+    ROLLE.SEED  = { value: 'Ursprung', content: '—' };
+    ROLLE.OUT   = { value: 'Ausgabe', content: '—' };
+    ROLLE.ROLLE = { value: 'Gesamtform', content: '—' };
+    updateUI();
+    log('⟲ RESET · Alles zurückgesetzt', 'warn');
+    interpret();
+}
+
+// ─── EXPORT ──────────────────────────────────────────────────
+function exportData() {
+    const data = JSON.stringify(ROLLE, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rolle_seed_${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    log('📤 EXPORT · ROLLE-Daten gespeichert', 'ok');
+}
+
+// ─── IMPORT ──────────────────────────────────────────────────
+function importData() {
+    document.getElementById('fileInput').click();
+}
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    if (!e.target.files.length) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        try {
+            const data = JSON.parse(ev.target.result);
+            if (data.ORT && data.USER && data.USE && data.SEED && data.OUT && data.ROLLE) {
+                Object.assign(ROLLE, data);
+                updateUI();
+                log('📥 IMPORT · ROLLE-Daten geladen', 'ok');
+                interpret();
+            } else {
+                log('❌ Ungültiges Format', 'warn');
+            }
+        } catch (err) {
+            log('❌ Import fehlgeschlagen: ' + err.message, 'warn');
+        }
+    };
+    reader.readAsText(e.target.files[0]);
+    e.target.value = '';
+});
+
+// ─── EVENTS ──────────────────────────────────────────────────
+document.getElementById('btn-set').addEventListener('click', setRole);
+document.getElementById('btn-interpret').addEventListener('click', interpret);
+document.getElementById('btn-reset').addEventListener('click', resetAll);
+document.getElementById('btn-export').addEventListener('click', exportData);
+document.getElementById('btn-import').addEventListener('click', importData);
+
+// ─── TASTATUR ────────────────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && document.activeElement === document.getElementById('input-value')) {
+        setRole();
+    }
+    if (e.key === 'Enter' && document.activeElement === document.getElementById('input-content')) {
+        setRole();
+    }
+    if (e.key === 'i' || e.key === 'I') interpret();
+    if (e.key === 'r' || e.key === 'R') resetAll();
+});
+
+// ─── INIT ────────────────────────────────────────────────────
+updateUI();
+log('⟁ ROLLE · UNIVERSAL · SEED geladen', 'seed');
+log('🌀 Alles rein · Alles raus · Interpretiere frei', 'interpret');
+interpret();
+
+console.log('⟁ ROLLE · UNIVERSAL · SEED');
+console.log('📝 Setze Werte & Inhalte für jede Rolle');
+console.log('🌀 Klick auf INTERPRETIEREN zeigt die universelle Bedeutung');
+</script>
+
+</body>
+</html>
